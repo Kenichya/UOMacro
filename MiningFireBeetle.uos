@@ -1,0 +1,54 @@
+@clearjournal
+if not @findalias 'FireBeetle'
+  promptalias 'FireBeetle'
+endif
+while not @injournal 'no metal here to mine' or @injournal "can't mine there"
+  //use picaxe to northe until specified weight is reached
+  pause 600
+  if @findtype 0xe86 'any' 'backpack' or @findtype 0xf39 'any' 'backpack'
+    useobject 'found'
+  else
+    sysmsg "You do not have any digging tools!"
+    stop
+  endif
+  //usetype 0xe86
+  waitfortarget 600
+  targettileoffset 0 -1 0
+  pause 600
+  // once weight is reached, smelt
+  if weight > 50
+    while counttype 0x19b9 'any' 'backpack' > 1
+      usetype! 0x19b9
+      while waitingfortarget
+      endwhile
+      target! 'FireBeetle'
+      pause 300
+    endwhile
+    while counttype 0x19b8 'any' 'backpack' > 1
+      usetype! 0x19b8
+      while waitingfortarget
+      endwhile
+      target! 'FireBeetle'
+      pause 300
+    endwhile
+    while counttype 0x19ba 'any' 'backpack' > 1
+      usetype! 0x19ba
+      waitingfortarget
+      target! 'FireBeetle'
+      pause 300
+    endwhile
+    while counttype 0x19b7 'any' 'backpack' > 7
+      usetype! 0x19b7
+      while waitingfortarget
+      endwhile
+      target! 'FireBeetle'
+      pause 300
+      if @injournal 'not enough metal-bearing'
+        pause 300
+        movetypeoffset 0x19b7 'backpack' 'ground' 0 1 0 'any' 1
+        @clearjournal
+      endif
+    endwhile
+  endif
+endwhile
+clearjournal

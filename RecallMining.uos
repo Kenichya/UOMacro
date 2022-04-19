@@ -1,0 +1,152 @@
+if not @findalias 'FireBeetle'
+    promptalias 'FireBeetle'
+endif
+removelist 'Runes'
+removelist 'Orebooks'
+if not @findobject 'Orebook1'
+    promptalias 'Orebook1'
+endif
+if not @findobject 'Orebook2'
+    promptalias 'Orebook2'
+endif
+if not @findobject 'Orebook3'
+    promptalias 'Orebook3'
+endif
+@clearjournal
+if not @findobject 'Orebooks'
+    createlist 'Orebooks'
+endif
+if list 'Orebooks' == 0
+    pushlist 'Orebooks' 'Orebook1'
+    pushlist 'Orebooks' 'Orebook2'
+    pushlist 'Orebooks' 'Orebook3'
+endif
+if not listexists 'Runes'
+    createlist 'Runes'
+endif
+for 0 to 'Orebooks'
+    //headmsg Orebooks[]
+    if list 'Runes' == 0
+        pushlist 'Runes' 50
+        pushlist 'Runes' 51
+        pushlist 'Runes' 52
+        pushlist 'Runes' 53
+        pushlist 'Runes' 54
+        pushlist 'Runes' 55
+        pushlist 'Runes' 56
+        pushlist 'Runes' 57
+        pushlist 'Runes' 58
+        pushlist 'Runes' 59
+        pushlist 'Runes' 60
+        pushlist 'Runes' 61
+        pushlist 'Runes' 62
+        pushlist 'Runes' 63
+        pushlist 'Runes' 64
+        pushlist 'Runes' 65
+    endif
+    for 0 to 'Runes'
+        //headmsg Runes[]
+        @clearjournal
+        pause 2000
+        useobject Orebooks[]
+        waitforgump 0x59 5000
+        replygump 0x59 Runes[]
+        pause 4000
+        if injournal 'blocked' 'system'
+            @clearjournal
+            replay
+        endif
+        while not @injournal 'There is no metal here to mine' 'system'
+            //@clearjournal
+            if @injournal "You can't mine there." "system"
+                @clearjournal
+                //headmsg 'Bad Rune'
+                // When in the city, recall back to the mining point.
+                pause 2000
+                useobject Orebooks[]
+                waitforgump 0x59 5000
+                replygump 0x59 Runes[]
+                pause 4000
+            endif
+            pause 1000
+            // When destroyed a pickaxe, make it again.
+            while not @findtype '0xe86' '0' 'backpack' 'any' '2' 
+                //headmsg 'Out of Pick'
+                usetype 0x1eb9
+                waitforgump 0x1cc 15000
+                replygump 0x1cc 1024
+                waitforgump 0x2ad 15000
+                replygump 0x2ad 24
+                waitforgump 0x1cc 15000
+                replygump 0x1cc 0
+            endwhile
+            usetype '0xe86' '0' 'backpack' 'any' '2'
+            waitfortarget 1000
+            targettileoffset 0 -1 0
+            pause 500
+            while counttype 0x19b9 'any' 'backpack' > 1
+                usetype! 0x19b9
+                waitingfortarget
+                target! 'FireBeetle'
+                pause 399
+            endwhile
+            while counttype 0x19b8 'any' 'backpack' > 1
+                usetype! 0x19b8
+                waitingfortarget
+                target! 'FireBeetle'
+                pause 400
+            endwhile
+            while counttype 0x19ba 'any' 'backpack' > 1
+                usetype! 0x19ba
+                waitingfortarget
+                target! 'FireBeetle' 
+                pause 401
+            endwhile
+            while counttype 0x19b7 'any' 'backpack' > 7
+                usetype! 0x19b7
+                waitingfortarget
+                target! 'FireBeetle'
+                pause 402
+                if @injournal 'not enough metal-bearing'
+                    pause 300
+                    movetypeoffset 0x19b7 'backpack' 'ground' 0 1 0 'any' 1
+                    pause 600
+                    movetypeoffset 0x19b7 'backpack' 'ground' -1 0 0 'any' 1
+                    @clearjournal
+                endif
+            endwhile
+            if weight > 460
+                // When destroyed a pickaxe, make it again.
+                while not @findtype '0xe86' '0' 'backpack' 'any' '2' 
+                    //headmsg 'Out of Pick'
+                    usetype 0x1eb9
+                    waitforgump 0x1cc 15000
+                    replygump 0x1cc 1024
+                    waitforgump 0x2ad 15000
+                    replygump 0x2ad 24
+                    waitforgump 0x1cc 15000
+                    replygump 0x1cc 0
+                endwhile
+                // Recall back to the bank.
+                cast "Recall"
+                waitfortarget 15000
+                target! 0x40ccfdc5
+                pause 2000
+                msg 'bank'
+                pause 1000
+                // Move ingots to the bank.
+                while @findtype 0x1bf2
+                    movetype 0x1bf2 'backpack' 'bank'
+                    pause 500
+                endwhile
+            endif
+        endwhile
+        // If mana is not enough, meditation.
+        if mana < 25
+            headmsg 'Need mana'
+            useskill 'meditation'
+            while mana < 40
+            endwhile
+        endif
+    endfor
+endfor
